@@ -1,4 +1,4 @@
-# PDF Q&A - RAG Application
+# ReadMate - RAG Application
 
 A clean, portfolio-ready PDF Question & Answer application built with Retrieval-Augmented Generation (RAG) architecture. Upload any PDF and ask questions about its content using Google Gemini AI.
 
