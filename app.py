@@ -27,6 +27,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from langchain_classic.chains import ConversationalRetrievalChain
 from langchain_classic.memory import ConversationBufferMemory
 from langchain_classic.prompts import PromptTemplate
+from langchain_core.embeddings import Embeddings
 
 # Environment variables
 from dotenv import load_dotenv
@@ -360,6 +361,102 @@ def load_css():
 
 
 # ============================================================================
+# RETRY-ENABLED EMBEDDING WRAPPER
+# ============================================================================
+
+# Import Google API core exceptions for proper error handling
+try:
+    from google.api_core.exceptions import (
+        ResourceExhausted,      # 429 - Rate limit exceeded
+        InternalServerError,    # 500 - Internal server error
+        ServiceUnavailable,     # 503 - Service unavailable
+        DeadlineExceeded,       # 504 - Deadline exceeded
+        TooManyRequests,        # 429 - Too many requests (alias)
+    )
+    GOOGLE_EXCEPTIONS = (ResourceExhausted, InternalServerError, ServiceUnavailable, DeadlineExceeded, TooManyRequests)
+except ImportError:
+    # Fallback if google-api-core not installed
+    GOOGLE_EXCEPTIONS = ()
+
+
+class RetryEmbeddings(Embeddings):
+    """
+    Wrapper around GoogleGenerativeAIEmbeddings that adds retry logic
+    for both document and query embeddings.
+
+    This is critical because the retriever embeds queries at search time,
+    and those embeddings can also hit 500/429/503 errors.
+    """
+
+    def __init__(
+        self,
+        model: str = "models/gemini-embedding-001",
+        google_api_key: str = None,
+        max_retries: int = 5,
+        base_delay: float = 2.0,
+    ):
+        self._embeddings = GoogleGenerativeAIEmbeddings(
+            model=model,
+            google_api_key=google_api_key,
+        )
+        self.max_retries = max_retries
+        self.base_delay = base_delay
+
+    def _is_retryable_error(self, error: Exception) -> bool:
+        """Check if an error is retryable (transient server error or rate limit)."""
+        # Check for Google API core exception types
+        if GOOGLE_EXCEPTIONS and isinstance(error, GOOGLE_EXCEPTIONS):
+            return True
+
+        # Fallback: check error string for common patterns
+        error_str = str(error)
+        retryable_patterns = [
+            "500", "INTERNAL", "429", "503", "504",
+            "RESOURCE_EXHAUSTED", "SERVICE_UNAVAILABLE",
+            "DEADLINE_EXCEEDED", "TOO_MANY_REQUESTS",
+            "rate limit", "quota exceeded", "busy", "unavailable",
+            "internal error", "server error", "temporarily unavailable"
+        ]
+        error_lower = error_str.lower()
+        return any(pattern.lower() in error_lower for pattern in retryable_patterns)
+
+    def _retry_embedding(self, func, *args, **kwargs):
+        """Execute embedding function with exponential backoff retry."""
+        import time
+        last_error = None
+        for attempt in range(self.max_retries):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                last_error = e
+
+                # Only retry on transient server errors or rate limits
+                if self._is_retryable_error(e):
+                    if attempt < self.max_retries - 1:
+                        wait_time = self.base_delay ** (attempt + 1)
+                        import streamlit as st
+                        st.warning(
+                            f"⏳ Embedding API busy (attempt {attempt + 1}/{self.max_retries}). "
+                            f"Retrying in {wait_time}s..."
+                        )
+                        time.sleep(wait_time)
+                        continue
+                else:
+                    # Non-transient error (e.g. auth, bad model) — fail immediately
+                    raise
+
+        # If we exhausted all retries, raise the last error
+        raise last_error
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Embed documents with retry logic."""
+        return self._retry_embedding(self._embeddings.embed_documents, texts)
+
+    def embed_query(self, text: str) -> List[float]:
+        """Embed a single query with retry logic."""
+        return self._retry_embedding(self._embeddings.embed_query, text)
+
+# ============================================================================
 # CONFIGURATION
 # ============================================================================
 
@@ -435,46 +532,20 @@ def create_vector_store(
     Returns:
         FAISS vector store containing the embedded chunks
     """
-    # Initialize Gemini embeddings
-    embeddings = GoogleGenerativeAIEmbeddings(
+    # Initialize retry-enabled embeddings wrapper
+    embeddings = RetryEmbeddings(
         model=embedding_model,
         google_api_key=api_key,
+        max_retries=max_retries,
     )
 
-    # Retry loop to handle transient 500/429 errors from the embedding API
-    # Google's free tier occasionally returns INTERNAL errors that succeed on retry
-    last_error = None
-    for attempt in range(max_retries):
-        try:
-            # Create FAISS vector store from chunks
-            # This will embed each chunk and store it in the FAISS index
-            vector_store = FAISS.from_documents(
-                documents=chunks,
-                embedding=embeddings,
-            )
-            return vector_store
-
-        except Exception as e:
-            last_error = e
-            error_str = str(e)
-
-            # Only retry on transient server errors (500) or rate limits (429)
-            if "500" in error_str or "INTERNAL" in error_str or "429" in error_str:
-                if attempt < max_retries - 1:
-                    # Exponential backoff: 2s, 4s, 8s, 16s
-                    wait_time = 2 ** (attempt + 1)
-                    st.warning(
-                        f"⏳ Embedding API busy (attempt {attempt + 1}/{max_retries}). "
-                        f"Retrying in {wait_time}s..."
-                    )
-                    time.sleep(wait_time)
-                    continue
-            else:
-                # Non-transient error (e.g. auth, bad model) — fail immediately
-                raise
-
-    # If we exhausted all retries, raise the last error
-    raise last_error
+    # Create FAISS vector store from chunks
+    # The RetryEmbeddings wrapper handles retries for both document and query embeddings
+    vector_store = FAISS.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+    )
+    return vector_store
 
 
 # ============================================================================
@@ -552,6 +623,25 @@ def create_qa_chain(
     return chain
 
 
+def _is_retryable_error(error: Exception) -> bool:
+    """Check if an error is retryable (transient server error or rate limit)."""
+    # Check for Google API core exception types
+    if GOOGLE_EXCEPTIONS and isinstance(error, GOOGLE_EXCEPTIONS):
+        return True
+
+    # Fallback: check error string for common patterns
+    error_str = str(error)
+    retryable_patterns = [
+        "500", "INTERNAL", "429", "503", "504",
+        "RESOURCE_EXHAUSTED", "SERVICE_UNAVAILABLE",
+        "DEADLINE_EXCEEDED", "TOO_MANY_REQUESTS",
+        "rate limit", "quota exceeded", "busy", "unavailable",
+        "internal error", "server error", "temporarily unavailable"
+    ]
+    error_lower = error_str.lower()
+    return any(pattern.lower() in error_lower for pattern in retryable_patterns)
+
+
 def invoke_with_retry(chain, inputs: dict, max_retries: int = 3) -> dict:
     """
     Invoke the QA chain with retry logic for transient API errors.
@@ -570,10 +660,9 @@ def invoke_with_retry(chain, inputs: dict, max_retries: int = 3) -> dict:
             return chain.invoke(inputs)
         except Exception as e:
             last_error = e
-            error_str = str(e)
 
-            # Only retry on transient server errors (500) or rate limits (429)
-            if "500" in error_str or "INTERNAL" in error_str or "429" in error_str:
+            # Only retry on transient server errors or rate limits
+            if _is_retryable_error(e):
                 if attempt < max_retries - 1:
                     wait_time = 2 ** (attempt + 1)
                     st.warning(
