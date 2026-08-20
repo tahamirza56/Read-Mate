@@ -4,7 +4,7 @@ langchain>=0.1.0
 langchain-google-genai>=0.0.5
 langchain-community>=0.0.10
 faiss-cpu>=1.7.4
-PyPDF2>=3.0.1
+pypdf>=4.0.0
 python-dotenv>=1.0.0
 
 # For text splitting
