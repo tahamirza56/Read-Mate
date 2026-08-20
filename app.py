@@ -51,6 +51,11 @@ def load_css():
         background-color: #2b1515 !important;
     }
 
+    header[data-testid="stHeader"] {
+        background-color: #2b1515 !important;
+    }
+
+
     /* ===== Header ===== */
     .app-header {
         background: #2b1515 !important;
@@ -86,7 +91,7 @@ def load_css():
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stTextInput label,
     section[data-testid="stSidebar"] .stFileUploader label {
-        color: #572f2f !important;
+        color: #e0e0e0 !important;
     }
     /* Sidebar branding */
     section[data-testid="stSidebar"] h2 {
@@ -135,14 +140,25 @@ def load_css():
     /* ===== Chat Input ===== */
     .stChatInput {
         border-radius: 12px !important;
-        border: 2px solid #667eea !important;
-        background: rgba(46, 39, 39,0.1) !important;
+        border: 2px solid #3095e3 !important;
+        background: rgba(27, 21, 21, 0.8) !important;
     }
     .stChatInput:focus-within {
-        border-color: #667eea !important;
+        border-color: #4aa3e8 !important;
     }
     .stChatInput input {
-        color: white !important;
+        color: #2e2424 !important;
+        background: transparent !important;
+    }
+    .stChatInput textarea {
+        color: #2e2424 !important;
+        background: transparent !important;
+    }
+    /* Placeholder text color */
+    .stChatInput input::placeholder,
+    .stChatInput textarea::placeholder {
+        color: #8a9ae8 !important;
+        opacity: 1 !important;
     }
 
     /* ===== Chat Messages ===== */
@@ -316,12 +332,18 @@ def load_css():
     /* ===== Text inputs ===== */
     .stTextInput input {
         background: rgba(48, 149, 227, 0.1) !important;
-        color: white !important;
+        color: #2e2c2c !important;
         border: 1px solid rgba(48, 149, 227, 0.5) !important;
     }
     .stTextInput label {
-        color: #e0e0e0 !important;
+        color: #2e2c2c !important;
     }
+
+    /* ADD THIS BLOCK to make the eye icon black */
+    section[data-testid="stSidebar"] .stTextInput button,
+    section[data-testid="stSidebar"] .stTextInput button svg {
+        color: black !important;
+        fill: black !important;
 
     /* ===== Select box ===== */
     .stSelectbox > div > div {
