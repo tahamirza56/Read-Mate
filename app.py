@@ -45,91 +45,125 @@ def load_css():
     /* ===== Global Layout ===== */
     .main > div {
         padding-top: 1.5rem;
+        background-color: #2b1515 !important;
+    }
+    .stApp {
+        background-color: #2b1515 !important;
     }
 
     /* ===== Header ===== */
     .app-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #2b1515 !important;
         padding: 2rem 2.5rem;
         border-radius: 16px;
         margin-bottom: 2rem;
-        color: black;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .app-header h1 {
         margin: 0;
         font-size: 2.2rem;
         font-weight: 700;
         letter-spacing: -0.5px;
+        color: white !important;
     }
     .app-header p {
         margin: 0.5rem 0 0 0;
         opacity: 0.9;
         font-size: 1.05rem;
+        color: white !important;
     }
 
     /* ===== Sidebar ===== */
     .css-1d391kg {
-        background: #f8f9fc;
+        background: #242121 !important;
     }
     section[data-testid="stSidebar"] > div:first-child {
-        background: linear-gradient(180deg, #1e1e2e 0%, #2a2a3e 100%);
+        background: #242121 !important;
         color: white;
     }
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] .stTextInput label,
     section[data-testid="stSidebar"] .stFileUploader label {
-        color: #e0e0e0 !important;
+        color: #572f2f !important;
+    }
+    /* Sidebar branding */
+    section[data-testid="stSidebar"] h2 {
+        color: #3095e3 !important;
+    }
+    section[data-testid="stSidebar"] p {
+        color: #8a9ae8 !important;
     }
 
     /* ===== Section Headers in Sidebar ===== */
     .sidebar-section {
-        background: rgba(255,255,255,0.05);
+        background: rgba(48, 149, 227, 0.1) !important;
         padding: 1rem;
         border-radius: 12px;
         margin-bottom: 1rem;
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid rgba(48, 149, 227, 0.3);
     }
     .sidebar-section h3 {
-        color: #a0a8ff;
+        color: #3095e3 !important;
         margin: 0 0 0.75rem 0;
         font-size: 1.1rem;
     }
 
     /* ===== File Uploader ===== */
     .stFileUploader > div:first-child {
-        border: 2px dashed #764ba2 !important;
+        border: 2px dashed #3095e3 !important;
         border-radius: 12px !important;
-        background: rgba(118, 75, 162, 0.05) !important;
+        background: rgba(48, 149, 227, 0.15) !important;
         transition: all 0.3s ease;
     }
     .stFileUploader > div:first-child:hover {
-        border-color: #667eea !important;
-        background: rgba(102, 126, 234, 0.1) !important;
+        border-color: #3095e3 !important;
+        background: rgba(48, 149, 227, 0.25) !important;
+    }
+    /* Upload button (Browse files) */
+    .stFileUploader button[kind="secondary"] {
+        background: black !important;
+        color: white !important;
+        border: 1px solid #3095e3 !important;
+    }
+    .stFileUploader button[kind="secondary"]:hover {
+        background: #1a1a1a !important;
+        border-color: #4aa3e8 !important;
     }
 
     /* ===== Chat Input ===== */
     .stChatInput {
         border-radius: 12px !important;
-        border: 2px solid #e0e0e0 !important;
+        border: 2px solid #667eea !important;
+        background: rgba(46, 39, 39,0.1) !important;
     }
     .stChatInput:focus-within {
         border-color: #667eea !important;
     }
+    .stChatInput input {
+        color: white !important;
+    }
 
     /* ===== Chat Messages ===== */
     .stChatMessage {
-        background: #f8f9fc !important;
+        background: rgba(48, 149, 227, 0.1) !important;
         border-radius: 12px !important;
         padding: 1rem !important;
         margin-bottom: 1rem !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        color: white !important;
+        border: 1px solid rgba(48, 149, 227, 0.2);
+    }
+    .stChatMessage p {
+        color: white !important;
     }
 
     /* ===== User Message ===== */
     .stChatMessage[data-testid="stChatMessageUser"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #3095e3 0%, #1a0d0d 100%) !important;
         color: white !important;
+        border: 1px solid rgba(48, 149, 227, 0.5);
     }
     .stChatMessage[data-testid="stChatMessageUser"] p {
         color: white !important;
@@ -137,15 +171,19 @@ def load_css():
 
     /* ===== Assistant Message ===== */
     .stChatMessage[data-testid="stChatMessageAssistant"] {
-        background: #ffffff !important;
-        border-left: 4px solid #667eea !important;
+        background: rgba(48, 149, 227, 0.15) !important;
+        border-left: 4px solid #3095e3 !important;
+        color: white !important;
+    }
+    .stChatMessage[data-testid="stChatMessageAssistant"] p {
+        color: white !important;
     }
 
     /* ===== Buttons ===== */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
+        background: #3095e3 !important;
+        color: white !important;
+        border: 1px solid #3095e3 !important;
         border-radius: 10px;
         padding: 0.6rem 1.2rem;
         font-weight: 600;
@@ -153,33 +191,45 @@ def load_css():
     }
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 15px rgba(48, 149, 227, 0.5) !important;
+        background: #4aa3e8 !important;
+        border-color: #4aa3e8 !important;
     }
 
     /* ===== Expander (Sources) ===== */
     .streamlit-expanderHeader {
-        background: #f0f2f8 !important;
+        background: rgba(48, 149, 227, 0.15) !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
+        color: #3095e3 !important;
+        border: 1px solid rgba(48, 149, 227, 0.3);
+    }
+    .streamlit-expanderContent {
+        background: rgba(48, 149, 227, 0.08) !important;
+        border-radius: 0 0 8px 8px !important;
+        color: white !important;
+        border: 1px solid rgba(48, 149, 227, 0.2);
+        border-top: none;
     }
 
     /* ===== Metrics Cards ===== */
     .metric-card {
-        background: white;
+        background: rgba(48, 149, 227, 0.1) !important;
         padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         text-align: center;
-        border-top: 3px solid #667eea;
+        border-top: 3px solid #3095e3;
+        color: white !important;
     }
     .metric-card .value {
         font-size: 2rem;
         font-weight: 700;
-        color: #667eea;
+        color: #3095e3;
     }
     .metric-card .label {
         font-size: 0.9rem;
-        color: #666;
+        color: #e0e0e0;
         margin-top: 0.25rem;
     }
 
@@ -187,9 +237,9 @@ def load_css():
     .welcome-container {
         text-align: center;
         padding: 3rem 2rem;
-        background: linear-gradient(135deg, #f5f7ff 0%, #faf5ff 100%);
+        background: #2b1515 !important;
         border-radius: 16px;
-        border: 1px solid #e8e0f0;
+        border: 1px solid rgba(48, 149, 227, 0.3);
     }
     .welcome-icon {
         font-size: 4rem;
@@ -198,27 +248,28 @@ def load_css():
     .welcome-title {
         font-size: 1.8rem;
         font-weight: 700;
-        color: #2a2a3e;
+        color: #3095e3 !important;
         margin-bottom: 0.5rem;
     }
     .welcome-subtitle {
         font-size: 1.05rem;
-        color: #666;
+        color: #b0b8e8 !important;
         margin-bottom: 2rem;
     }
 
     /* ===== Source Citation Cards ===== */
     .source-card {
-        background: #fafafa;
-        border-left: 3px solid #764ba2;
+        background: rgba(48, 149, 227, 0.1) !important;
+        border-left: 3px solid #3095e3;
         padding: 0.75rem 1rem;
         border-radius: 8px;
         margin-bottom: 0.5rem;
         font-size: 0.9rem;
+        color: white !important;
     }
     .source-page {
         display: inline-block;
-        background: #667eea;
+        background: #3095e3;
         color: white;
         padding: 0.1rem 0.6rem;
         border-radius: 12px;
@@ -228,35 +279,59 @@ def load_css():
 
     /* ===== Progress Bar ===== */
     .stProgress > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #3095e3 0%, #1a0d0d 100%) !important;
     }
 
     /* ===== Info/Success/Error Boxes ===== */
     .stAlert {
         border-radius: 10px !important;
+        background: rgba(48, 149, 227, 0.15) !important;
+        color: white !important;
+        border: 1px solid rgba(48, 149, 227, 0.3);
     }
 
     /* ===== Footer ===== */
     .footer {
         text-align: center;
         padding: 1.5rem;
-        color: #999;
+        color: #8a9ae8;
         font-size: 0.85rem;
-        border-top: 1px solid #eee;
+        border-top: 1px solid rgba(48, 149, 227, 0.2);
         margin-top: 2rem;
     }
 
     /* ===== Spinner ===== */
     .stSpinner {
-        color: #667eea !important;
+        color: #3095e3 !important;
     }
 
     /* ===== Divider ===== */
     hr {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #ddd, transparent);
+        background: linear-gradient(90deg, transparent, rgba(48, 149, 227, 0.5), transparent);
         margin: 1.5rem 0;
+    }
+
+    /* ===== Text inputs ===== */
+    .stTextInput input {
+        background: rgba(48, 149, 227, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(48, 149, 227, 0.5) !important;
+    }
+    .stTextInput label {
+        color: #e0e0e0 !important;
+    }
+
+    /* ===== Select box ===== */
+    .stSelectbox > div > div {
+        background: rgba(48, 149, 227, 0.1) !important;
+        color: white !important;
+    }
+
+    /* ===== General text ===== */
+    .stMarkdown, .stText, p, span, div {
+        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
