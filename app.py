@@ -1,9 +1,4 @@
 """
-PDF Q&A Application using RAG (Retrieval-Augmented Generation)
-==============================================================
-A clean, portfolio-ready application that allows users to upload PDFs
-and ask questions about their content using Google Gemini AI.
-
 Architecture:
 - Streamlit for UI
 - LangChain for orchestration
@@ -34,9 +29,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# ============================================================================
 # CUSTOM CSS STYLING
-# ============================================================================
+
 
 def load_css():
     """Inject custom CSS for a polished, modern UI."""
@@ -374,9 +368,7 @@ def get_config() -> dict:
     }
 
 
-# ============================================================================
 # PDF PROCESSING
-# ============================================================================
 
 def load_and_split_pdf(
     pdf_path: str,
@@ -413,9 +405,7 @@ def load_and_split_pdf(
     return chunks
 
 
-# ============================================================================
 # VECTOR STORE
-# ============================================================================
 
 def create_vector_store(
     chunks: List,
@@ -477,9 +467,7 @@ def create_vector_store(
     raise last_error
 
 
-# ============================================================================
 # QA CHAIN
-# ============================================================================
 
 def create_qa_chain(
     vector_store: FAISS,
@@ -590,9 +578,7 @@ def invoke_with_retry(chain, inputs: dict, max_retries: int = 3) -> dict:
     raise last_error
 
 
-# ============================================================================
 # STREAMLIT UI
-# ============================================================================
 
 def init_session_state():
     """Initialize Streamlit session state variables."""
